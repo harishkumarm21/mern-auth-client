@@ -1,13 +1,13 @@
 import axios from "axios";
-import { createContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState, useContext } from "react";
 import { toast } from "react-toastify";
 
-export const AppContext = createContext();
+const AppContext = createContext();
 
 export const AppContextProvider = (props) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userData, setUserdata] = useState(false);
+  const [userData, setUserdata] = useState(null);
 
   const getAuthState = async () => {
     try {
@@ -25,16 +25,25 @@ export const AppContextProvider = (props) => {
     }
   };
 
-  const getUserData = async () => {
-    try {
-      const { data } = await axios.get(backendUrl + "/api/user/data", {
+const getUserData = async () => {
+  try {
+    const { data } = await axios.get(
+      backendUrl + "/api/user/data",
+      {
         withCredentials: true,
-      });
-      data.success ? setUserdata(data.userData) : toast.error(data.message);
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
+      }
+    );
+
+    console.log("USER DATA API RESPONSE:", data);
+
+    data.success
+      ? setUserdata(data.userData)
+      : toast.error(data.message);
+
+  } catch (error) {
+    toast.error(error.message);
+  }
+};
 
   useEffect(() => {
     getAuthState();
@@ -50,7 +59,17 @@ export const AppContextProvider = (props) => {
     getAuthState,
   };
 
+  useEffect(() => {
+  console.log("Context userData changed:", userData);
+}, [userData]);
+
   return (
     <AppContext.Provider value={value}>{props.children}</AppContext.Provider>
   );
 };
+
+
+// 3. Export a custom hook to use the context (Vite is okay with this!)
+export function useApp() {
+  return useContext(AppContext);
+}

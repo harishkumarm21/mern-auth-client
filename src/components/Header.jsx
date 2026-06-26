@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
 import { assets } from "../assets/assets";
-import { AppContext } from "../context/AppContext";
+import { useApp } from "../context/AppContext";
 
 const Header = () => {
-  const { userData } = useContext(AppContext);
+  const { userData } = useApp();
   console.log("AppContext =>", JSON.stringify(userData))
   return (
     <div className="flex flex-col items-center mt-20 text-gray-800 text-center">
